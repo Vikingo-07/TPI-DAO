@@ -12,4 +12,4 @@ class Devolucion:
         self.fecha_actual = fecha_actual,
         self.doc_socio = doc_socio,
         self.cod_libro = cod_libro,
-        self.demora = demora
+        self.dias_demora = demora
