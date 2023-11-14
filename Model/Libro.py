@@ -1,7 +1,8 @@
 import datetime
 
+
 class Libro:
-    def __init__(self, codigo, titulo, precio_rep):
+    def __init__(self, codigo, isbn, titulo, precio_rep):
         """
         Los parametros estado y fecha desde se setean en la creación de la instancia.
         :param codigo:
@@ -9,6 +10,7 @@ class Libro:
         :param precio_rep:
         """
         self.codigo = codigo,
+        self.isbn = isbn,
         self.titulo = titulo,
         self.precio_rep = precio_rep,
         self.estado = "DISPONIBLE"
