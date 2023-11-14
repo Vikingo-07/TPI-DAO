@@ -1,6 +1,5 @@
 import datetime
 
-
 class Libro:
     def __init__(self, codigo, titulo, precio_rep):
         """
