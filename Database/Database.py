@@ -194,6 +194,7 @@ def get_libro_por_codigo(libro_codigo):
         return None
 
 
+
 def crear_socio(documento, nombre, apellido, telefono):
     """
 
@@ -334,7 +335,7 @@ def actualizar_estado_libro(libro_id, estado):
         print(f"Error al marcar el libro como EXTRAVIADO: {e}")
 
 
-def obtener_libros_por_estado(estado):
+def get_libros_por_estado(estado):
     try:
         with sqlite3.connect('database.sqlite3') as conn:
             cursor = conn.cursor()
@@ -423,6 +424,24 @@ def get_all_titulos():
         return None
 
 
+def get_libros_prestados():
+    #TODO: mal planteada, tiene que devolver prestamos y libros y fechas
+    try:
+        with sqlite3.connect('database.sqlite3') as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                   SELECT Libros.*
+                   FROM Libros
+                   JOIN Prestamos ON Libros.ID = Prestamos.LibroId
+                   WHERE Prestamos.FechaDevolucion IS NULL
+               ''')
+            libros_prestados_no_devueltos = cursor.fetchall()
+            return libros_prestados_no_devueltos
+    except Exception as e:
+        print(f"Error al obtener libros prestados no devueltos: {e}")
+        return None
+
+
 # Metodos para reportes
 def cantidad_libros_por_estado():
     try:
@@ -497,5 +516,3 @@ def prestamos_demorados():
         print(f"Error al obtener los préstamos demorados: {e}")
         return None
 
-
-print(prestamos_de_socio(1))
