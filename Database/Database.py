@@ -202,6 +202,18 @@ def get_libro_por_codigo(libro_codigo):
         return None
 
 
+def get_all_libros():
+    try:
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT * FROM Libros')
+            libros = cursor.fetchall()
+            return libros
+    except Exception as e:
+        print(f"Error al buscar libro por código: {e}")
+        return None
+
+
 def crear_socio(documento, nombre, apellido, telefono):
     """
 
@@ -277,6 +289,18 @@ def get_socio_por_id(socio_id):
             cursor.execute('SELECT * FROM Socios WHERE ID = ?', (socio_id,))
             socio = cursor.fetchone()
             return socio
+    except Exception as e:
+        print(f"Error al buscar socio por ID: {e}")
+        return None
+
+
+def get_all_socios():
+    try:
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT ID, nroDocumento, nombre, apellido, telefono FROM Socios')
+            socios = cursor.fetchall()
+            return socios
     except Exception as e:
         print(f"Error al buscar socio por ID: {e}")
         return None
@@ -522,4 +546,3 @@ def prestamos_demorados():
     except Exception as e:
         print(f"Error al obtener los préstamos demorados: {e}")
         return None
-

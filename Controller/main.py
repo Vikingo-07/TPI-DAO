@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import Database.Database
 from Database.Database import *
 from Model.Libro import Libro
+from Model.Socio import Socio
 
 
 def alta_socio(socio):
@@ -29,6 +30,24 @@ def mod_libro(libro):
 
 def baja_libro(libro_id):
     eliminar_libro(libro_id)
+
+
+def buscar_all_libros():
+    libros = get_all_libros()
+    all_libros = []
+    for libro in libros:
+        id_libros, codigo, nombre, precio_rep, estado = libro
+        all_libros.append(Libro(id_libros, codigo, nombre, precio_rep, estado))
+
+
+def buscar_all_socios():
+    socios = get_all_socios()
+    all_socios = []
+    for socio in socios:
+        print(socio)
+        id_socio, nro_documento, nombre, apellido, telefono = socio
+        all_socios.append(Socio(id_socio, nro_documento, nombre, apellido, telefono))
+    return all_socios
 
 
 def registrar_prestamo(prestamo):

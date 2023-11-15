@@ -39,7 +39,8 @@ class PrincipalWindow:
         btn_extraviados = Button(botonera, text="Libros Extraviados", bg="medium turquoise", padx="19", pady="50",
                                  borderwidth=0, foreground="white", font=("Arial", 10, "bold"), cursor="target")
         btn_extraviados.pack(side="top", pady=10)
-        btn_extraviados["command"] = self.extraviados
+        #btn_extraviados["command"] = self.extraviados
+        btn_extraviados["command"] = self.libros_extraviados_command
 
         btn_reportes = Button(botonera, text="Reportes", bg="medium turquoise", padx="44", pady="50", borderwidth=0,
                               foreground="white", font=("Arial", 10, "bold"), cursor="target")
@@ -59,6 +60,27 @@ class PrincipalWindow:
         self.eliminar_botones_reporte()
         self.lblgral.configure(text="Socios")
 
+        # Crear el Treeview (grilla)
+        tree = ttk.Treeview(self.window, columns=('ID', 'NroDocumento', 'Nombre', 'Apellido', 'Teléfono'))
+        #tree.heading('#0', text='nada')
+        tree.heading('#1', text='ID')
+        tree.heading('#2', text='NroDocumento')
+        tree.heading('#3', text='Nombre')
+        tree.heading('#4', text='Apellido')
+        tree.heading('#5', text='Teléfono')
+
+        # Obtener datos de socios desde la base de datos
+        datos_socios = buscar_all_socios()
+
+        # Insertar datos en la grilla
+        for socio in datos_socios:
+            print(socio.nombre, socio.apellido)
+            tree.insert('', 'end', values=(socio.id, socio.documento, socio.nombre, socio.apellido, socio.telefono))
+
+        # Mostrar la grilla
+        tree.column('#0', width=10)
+        tree.pack(pady=10)
+
     def libros(self):
         self.eliminar_botones_reporte()
         self.lblgral.configure(text="Libros")
@@ -70,6 +92,80 @@ class PrincipalWindow:
     def extraviados(self):
         self.eliminar_botones_reporte()
         self.lblgral.configure(text="Libros extraviados")
+
+    def crear_boton_extravio(self):
+        if hasattr(self, 'btn_abmExtravio'):
+            return
+
+        self.btn_abmExtravio = Button(self.window, text="Lista de libros extraviados", bg="CadetBlue4", padx="44",
+                                      pady="30", borderwidth=0, foreground="white",
+                                      font=("Arial", 10, "bold"), cursor="target")
+        self.btn_abmExtravio.pack(side="top", pady=10)
+        self.btn_abmExtravio["command"] = self.libros_extraviados_command
+
+    def libros_extraviados_command(self):
+
+        window_extravio = Toplevel(self.window)
+        window_extravio.title("Registro de Libros Extraviados")
+        window_extravio.geometry("+250+100")
+        window_extravio.geometry("600x300")
+        window_extravio.iconbitmap("../Files/icono.ico")
+        window_extravio.configure(bg="gray22")
+
+        label_extravio = Label(window_extravio, text="Registro de Libros Extraviados", font=("Arial", 20),
+                               bg="gray22", fg="white")
+        label_extravio.pack(pady=10)
+
+        # Configurar la Treeview
+        columns = ("Codigo", "Titulo", "Precio de reposicion", "Estado")
+        treeview = ttk.Treeview(window_extravio, columns=columns)
+        for col in columns:
+            treeview.heading(col, text=col, anchor="center")
+            treeview.column(col, width=150, anchor="center")
+        # Ocultar la primera columna en blanco
+        treeview["show"] = "headings"
+
+        libros_extraviados = get_libros_extraviados()
+
+        # Insertar datos en la grilla
+        for libro in libros_extraviados:
+            treeview.insert('', 'end', values=(libro.codigo, libro.titulo, libro.precio_rep, libro.estado))
+
+        treeview.pack(padx=10, pady=10)
+
+        self.textboxes = []
+        for i, col in enumerate(columns[:1]):
+            label = Label(window_extravio, text=col, bg="gray22", fg="white")
+            label.pack(pady=5)
+            entry = Entry(window_extravio)
+            entry.pack(pady=5)
+            self.textboxes.append(entry)
+
+        def submit():
+
+            libro_id = self.textboxes[0].get()  # Suponiendo que el ID está en el primer cuadro de texto
+
+            # Llama a la función registrar_extravio con los valores obtenidos
+            registrar_libro_extraviado(libro_id)
+
+            # Cierra la ventana después de procesar el registro
+            window_extravio.destroy()
+
+        submit_button = Button(window_extravio, text="Cambiar estado de libro", command=submit, bg="CadetBlue4",
+                               padx="20", pady="10",
+                               borderwidth=0, foreground="white", font=("Arial", 10, "bold"), cursor="target")
+        submit_button.pack(pady=10)
+
+    def eliminar_botones_libros_extraviados(self):
+        if self.bandera:
+            self.bandera = False
+            self.btn_abmExtravio.destroy()
+
+
+
+
+
+
 
     def reportes(self):
         self.eliminar_botones_reporte()
