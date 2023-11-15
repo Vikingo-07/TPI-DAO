@@ -469,8 +469,7 @@ def prestamos_de_socio(socio_id):
         with sqlite3.connect('database.sqlite3') as conn:
             cursor = conn.cursor()
             cursor.execute(
-                'SELECT Libros.Titulo, Prestamos.FechaPrestamo, Prestamos.DiasPactados, Prestamos.FechaDevolucion, '
-                'Prestamos.DemoraDias'
+                'SELECT Libros.Titulo, Prestamos.FechaPrestamo, Prestamos.DiasPactados '
                 'FROM Prestamos '
                 'JOIN Libros ON Prestamos.LibroId = Libros.ID '
                 'JOIN Socios ON Prestamos.SocioId = Socios.ID '
@@ -498,5 +497,5 @@ def prestamos_demorados():
         print(f"Error al obtener los préstamos demorados: {e}")
         return None
 
-crear_db()
-cargar_datos()
+
+print(prestamos_de_socio(1))
