@@ -184,10 +184,10 @@ class PrincipalWindow:
             solicitantes = solicitantes_libro(title_book)
             if len(solicitantes) == 0:
                 window_alert = Toplevel(self.window, bg="gray22")
-                window_alert.title("No existe")
+                window_alert.title("Sin solicitantes")
                 window_alert.geometry("+400+120")
                 window_alert.geometry("300x100")
-                label_alert = Label(window_alert, text=f"No existe un libro llamado {title_book}.", font=("Arial", 10),
+                label_alert = Label(window_alert, text=f"El libro {title_book} no tiene solicitantes.", font=("Arial", 10),
                                            bg="gray22", fg="white")
                 label_alert.pack(pady=10)
                 def submit2():
@@ -203,11 +203,11 @@ class PrincipalWindow:
                 window_solicitante.geometry("600x400")
                 window_solicitante.iconbitmap("../Files/icono.ico")
                 window_solicitante.configure(bg="gray22")
-                label_solicitantes = Label(window_solicitante, text=f"Solicitantes de {title_book}", font=("Arial", 20),
+                label_solicitantes = Label(window_solicitante, text=f"Solicitantes de libros que contengan '{title_book}'", font=("Arial", 20),
                                            bg="gray22", fg="white")
                 label_solicitantes.pack(pady=10)
                 listbox = Listbox(window_solicitante, height=15,
-                                  width=15,
+                                  width=70,
                                   bg="grey",
                                   activestyle='dotbox',
                                   font="Helvetica",
@@ -215,7 +215,7 @@ class PrincipalWindow:
                 i = 0
                 for solcitante in solicitantes:
                     i += 1
-                    listbox.insert(i, solcitante)
+                    listbox.insert(i, f"Libro: {solcitante[0]}    -    Solicitante: {solcitante[1]} {solcitante[2]}")
                 listbox.pack()
                 def submit2():
                     window_book.destroy()

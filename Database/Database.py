@@ -478,7 +478,7 @@ def solicitantes_de_libro(titulo_libro):
     try:
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT Socios.Nombre, Socios.apellido '
+            cursor.execute('SELECT Libros.Titulo ,Socios.Nombre, Socios.apellido '
                            'FROM Socios '
                            'JOIN Prestamos ON Socios.ID = Prestamos.SocioId '
                            'JOIN Libros ON Prestamos.LibroId = Libros.ID '
