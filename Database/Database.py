@@ -87,15 +87,15 @@ def cargar_datos():
 
             # Generar 20 entradas de prueba para la tabla Prestamos
             for _ in range(20):
-                fecha_prestamo = date.today() - timedelta(days=random.randint(1, 365))
-                dias_pactados = timedelta(days=random.randint(1, 25))
-                fecha_devolucion = fecha_prestamo + dias_pactados + timedelta(days=random.randint(0, 10))
+                fecha_prestamo = datetime.now().date() - timedelta(days=random.randint(1, 365))
+                dias_pactados = random.randint(1, 25)
+                fecha_devolucion = fecha_prestamo + timedelta(days=dias_pactados) + timedelta(days=random.randint(0, 10))
                 cursor.execute('''
                         INSERT INTO Prestamos (LibroId, SocioId, FechaPrestamo, DiasPactados, FechaDevolucion, DemoraDias)
                         VALUES (?, ?, ?, ?, ?, ?)
                     ''', (
-                    random.randint(1, 20), random.randint(1, 20), fecha_prestamo, str(dias_pactados),
-                    str(fecha_devolucion),
+                    random.randint(1, 20), random.randint(1, 20), fecha_prestamo.strftime("%d/%m/%Y"), dias_pactados,
+                    fecha_devolucion.strftime("%d/%m/%Y"),
                     0))
 
     except sqlite3.Error as error:
@@ -497,3 +497,6 @@ def prestamos_demorados():
     except Exception as e:
         print(f"Error al obtener los préstamos demorados: {e}")
         return None
+
+crear_db()
+cargar_datos()
