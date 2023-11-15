@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 import Database.Database
 from Database.Database import *
+from Model.Libro import Libro
 
 
 def alta_socio(socio):
@@ -31,6 +32,7 @@ def baja_libro(libro_id):
 
 
 def registrar_prestamo(prestamo):
+    #TODO: validar que el estado del libro sea DISPONIBLE
     fecha_prestamo = datetime.strftime(datetime.today(), "%d/%m/%Y")
     registrar_prestamo(prestamo.libro, prestamo.socio, fecha_prestamo, prestamo.dias_pactados)
 
@@ -109,8 +111,22 @@ def libros_por_estado(estado):
 
 
 def get_libros_extraviados():
-    libros_prestados = get_libros_prestados()
-    #TODO: pendiente de implementar
+    """
+    El metodo devuelve todos los libros que se encuentran prestados y
+    que ya hayan pasado 30 dias de la fecha de devolucion
+    :return: lista de Libros
+    """
+    demoras = get_demoras()
+    libros = []
+    for demora in demoras:
+        libro_id, fecha_prestamo, dias_pactados = demora
+        fecha_prestamo = datetime.strptime(fecha_prestamo, "%d/%m/%Y")
+        dias_pactados = timedelta(days=(dias_pactados + 30))
+        if fecha_prestamo.date() + dias_pactados < datetime.now().date():
+            libro_id, codigo, nombre, precio_rep, estado = get_libro_por_id(libro_id)
+            libro = Libro(libro_id, codigo, nombre, precio_rep, estado)
+            libros.append(libro)
+    return libros
 
 
 
@@ -143,3 +159,6 @@ def prestamos_demorados():
         if fecha_pactada < hoy:
             prestamosDemorados.append(prestamo)
     return prestamosDemorados
+
+
+print(get_libros_extraviados())

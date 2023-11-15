@@ -96,7 +96,8 @@ def cargar_datos():
             for _ in range(20):
                 fecha_prestamo = datetime.now().date() - timedelta(days=random.randint(1, 365))
                 dias_pactados = random.randint(1, 25)
-                fecha_devolucion = fecha_prestamo + timedelta(days=dias_pactados) + timedelta(days=random.randint(0, 10))
+                fecha_devolucion = fecha_prestamo + timedelta(days=dias_pactados) + timedelta(
+                    days=random.randint(0, 10))
                 cursor.execute('''
                         INSERT INTO Prestamos (LibroId, SocioId, FechaPrestamo, DiasPactados, FechaDevolucion, DemoraDias)
                         VALUES (?, ?, ?, ?, ?, ?)
@@ -199,7 +200,6 @@ def get_libro_por_codigo(libro_codigo):
     except Exception as e:
         print(f"Error al buscar libro por código: {e}")
         return None
-
 
 
 def crear_socio(documento, nombre, apellido, telefono):
@@ -431,17 +431,17 @@ def get_all_titulos():
         return None
 
 
-def get_libros_prestados():
-    #TODO: mal planteada, tiene que devolver prestamos y libros y fechas
+def get_demoras():
+    """
+    Similar al prestamos_demorados pero este devuelve unicamente el id del libro
+    :return: Lista de id_libro que se encuentran, actualmente, prestados
+    """
     try:
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                   SELECT Libros.*
-                   FROM Libros
-                   JOIN Prestamos ON Libros.ID = Prestamos.LibroId
-                   WHERE Prestamos.FechaDevolucion IS NULL
-               ''')
+            SELECT LibroId, FechaPrestamo, DiasPactados 
+            FROM Prestamos WHERE FechaDevolucion IS NULL''')
             libros_prestados_no_devueltos = cursor.fetchall()
             return libros_prestados_no_devueltos
     except Exception as e:
