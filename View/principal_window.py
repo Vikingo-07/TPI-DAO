@@ -1,6 +1,6 @@
 from tkinter import *
 from tkinter import ttk
-
+from Controller.main import *
 
 class PrincipalWindow:
     def __init__(self):
@@ -128,20 +128,16 @@ class PrincipalWindow:
         window_books.iconbitmap("../Files/icono.ico")
         window_books.configure(bg="gray22")
 
-        cant_disp = 2 # modificar
-        cant_prest = 3 # modificar
-        cant_extrav = 5 # modificar
+        cantidades = cantidad_libros_por_estado()
+
 
         label_book = Label(window_books, text="Cantidad de Libros por estado", font=("Arial", 20), bg="gray22",
                             fg="white")
         label_book.pack(pady=10)
-        label_book3 = Label(window_books, text=f"Disponibles: {cant_disp}", font=("Arial", 12), bg="gray22", fg="white")
-        label_book3.pack(pady=10)
-        label_book1 = Label(window_books, text=f"Prestados: {cant_prest}", font=("Arial", 12), bg="gray22", fg="white")
-        label_book1.pack(pady=10)
-        label_book2 = Label(window_books, text=f"Extraviados: {cant_extrav}", font=("Arial", 12), bg="gray22",
-                            fg="white")
-        label_book2.pack(pady=10)
+        for status, quantity in cantidades:
+            print(f"Estado: {status}, Cantidad: {quantity}")
+            label_book = Label(window_books, text=f"Hay {quantity} Libros en estado {status}.", font=("Arial", 12), bg="gray22", fg="white")
+            label_book.pack(pady=10)
 
         def submit():
             window_books.destroy()
@@ -158,7 +154,7 @@ class PrincipalWindow:
         window_books.iconbitmap("../Files/icono.ico")
         window_books.configure(bg="gray22")
 
-        cant_disp = 500  # modificar
+        cant_disp = total_costo_reposicion()
         label_book = Label(window_books, text=f"El costo total para reponer los libros extraviados es ${cant_disp}.",
                            font=("Arial", 12), bg="gray22", fg="white")
         label_book.pack(pady=10)
@@ -186,35 +182,53 @@ class PrincipalWindow:
         def submit():
             # self.window_book.destroy()
             title_book = title_input.get()
-            window_solicitante = Toplevel(self.window)
-            window_solicitante.title(f"Solicitantes de {title_book}")
-            window_solicitante.geometry("+250+100")
-            window_solicitante.geometry("600x400")
-            window_solicitante.iconbitmap("../Files/icono.ico")
-            window_solicitante.configure(bg="gray22")
-            label_solicitantes = Label(window_solicitante, text=f"Solicitantes de {title_book}", font=("Arial", 20),
-                                       bg="gray22", fg="white")
-            label_solicitantes.pack(pady=10)
-            listbox = Listbox(window_solicitante, height=15,
-                              width=15,
-                              bg="grey",
-                              activestyle='dotbox',
-                              font="Helvetica",
-                              fg="black")
-            i = 0
-            retorno = ["prueba1", "prueba2", "prueba3"]
-            for solcitante in retorno:
-                i += 1
-                listbox.insert(i, solcitante)
-            listbox.pack()
+            solicitantes = solicitantes_libro(title_book)
+            if len(solicitantes) == 0:
+                window_alert = Toplevel(self.window, bg="gray22")
+                window_alert.title("No existe")
+                window_alert.geometry("+400+120")
+                window_alert.geometry("300x100")
+                label_alert = Label(window_alert, text=f"No existe un libro llamado {title_book}.", font=("Arial", 10),
+                                           bg="gray22", fg="white")
+                label_alert.pack(pady=10)
+                def submit2():
+                    window_alert.destroy()
+                submit2_button = Button(window_alert, text="Aceptar", command=submit2, bg="CadetBlue4", padx="20",
+                                        pady="10",
+                                        borderwidth=0, foreground="white", font=("Arial", 10, "bold"), cursor="target")
+                submit2_button.pack(pady=10)
+            else:
+                window_solicitante = Toplevel(self.window)
+                window_solicitante.title(f"Solicitantes de {title_book}")
+                window_solicitante.geometry("+250+100")
+                window_solicitante.geometry("600x400")
+                window_solicitante.iconbitmap("../Files/icono.ico")
+                window_solicitante.configure(bg="gray22")
+                label_solicitantes = Label(window_solicitante, text=f"Solicitantes de {title_book}", font=("Arial", 20),
+                                           bg="gray22", fg="white")
+                label_solicitantes.pack(pady=10)
+                listbox = Listbox(window_solicitante, height=15,
+                                  width=15,
+                                  bg="grey",
+                                  activestyle='dotbox',
+                                  font="Helvetica",
+                                  fg="black")
+                i = 0
+                for solcitante in solicitantes:
+                    i += 1
+                    listbox.insert(i, solcitante)
+                listbox.pack()
+                def submit2():
+                    window_book.destroy()
+                    window_solicitante.destroy()
+                submit2_button = Button(window_solicitante, text="Aceptar", command=submit2, bg="CadetBlue4", padx="20",
+                                        pady="10",
+                                        borderwidth=0, foreground="white", font=("Arial", 10, "bold"), cursor="target")
+                submit2_button.pack(pady=10)
 
-            def submit2():
-                window_book.destroy()
-                window_solicitante.destroy()
 
-            submit2_button = Button(window_solicitante, text="Aceptar", command=submit2, bg="CadetBlue4", padx="20", pady="10",
-                                   borderwidth=0, foreground="white", font=("Arial", 10, "bold"), cursor="target")
-            submit2_button.pack(pady=10)
+
+
 
 
         submit_button = Button(window_book, text="Aceptar", command=submit, bg="CadetBlue4", padx="20", pady="10",
@@ -238,36 +252,56 @@ class PrincipalWindow:
         def submit():
             # self.window_book.destroy()
             number = number_input.get()
-            socio = "pepito" # modificar
-            window_solicitante = Toplevel(self.window)
-            window_solicitante.title(f"Solicitantes de {socio}")
-            window_solicitante.geometry("+250+100")
-            window_solicitante.geometry("600x400")
-            window_solicitante.iconbitmap("../Files/icono.ico")
-            window_solicitante.configure(bg="gray22")
-            label_solicitantes = Label(window_solicitante, text=f"Prestamos de {socio}", font=("Arial", 20),
-                                       bg="gray22", fg="white")
-            label_solicitantes.pack(pady=10)
-            listbox = Listbox(window_solicitante, height=15,
-                              width=15,
-                              bg="grey",
-                              activestyle='dotbox',
-                              font="Helvetica",
-                              fg="black")
-            i = 0
-            retorno = ["prueba1", "prueba2", "prueba3"]
-            for prestamo in retorno:
-                i += 1
-                listbox.insert(i, prestamo)
-            listbox.pack()
+            socio = buscar_socio_por_id(number)
+            prestamos = prestamos_socio(number)
+            if prestamos is None or socio is None:
+                window_alert = Toplevel(self.window, bg="gray22")
+                window_alert.geometry("+400+120")
+                window_alert.geometry("300x100")
+                if socio is None:
+                    window_alert.title("No existe un socio con ese código.")
+                    label_alert = Label(window_alert, text=f"No existe un socio con el código {number}.", font=("Arial", 10), bg="gray22",
+                                        fg="white")
+                    label_alert.pack(pady=10)
+                else:
+                    window_alert.title("No contiene prestamos")
+                    label_alert = Label(window_alert, text=f"{socio[2]} no tiene prestamos.", font=("Arial", 10),
+                                        bg="gray22", fg="white")
+                    label_alert.pack(pady=10)
+                def submit2():
+                    window_alert.destroy()
+                submit2_button = Button(window_alert, text="Aceptar", command=submit2, bg="CadetBlue4", padx="20",
+                                        pady="10",
+                                        borderwidth=0, foreground="white", font=("Arial", 10, "bold"), cursor="target")
+                submit2_button.pack(pady=10)
+            else:
+                window_prestamos = Toplevel(self.window)
+                window_prestamos.title(f"Solicitantes de {socio[2]}")
+                window_prestamos.geometry("+250+100")
+                window_prestamos.geometry("600x400")
+                window_prestamos.iconbitmap("../Files/icono.ico")
+                window_prestamos.configure(bg="gray22")
+                label_solicitantes = Label(window_prestamos, text=f"Prestamos de {socio[2]}", font=("Arial", 20),
+                                           bg="gray22", fg="white")
+                label_solicitantes.pack(pady=10)
+                listbox = Listbox(window_prestamos, height=15,
+                                  width=50,
+                                  bg="grey",
+                                  activestyle='dotbox',
+                                  font="Helvetica",
+                                  fg="black")
+                i = 0
+                for prestamo in prestamos:
+                    i += 1
+                    listbox.insert(i, prestamo)
+                listbox.pack()
 
-            def submit2():
-                window_prestamos.destroy()
-                window_solicitante.destroy()
+                def submit2():
+                    window_prestamos.destroy()
 
-            submit2_button = Button(window_solicitante, text="Aceptar", command=submit2, bg="CadetBlue4", padx="20", pady="10",
-                                   borderwidth=0, foreground="white", font=("Arial", 10, "bold"), cursor="target")
-            submit2_button.pack(pady=10)
+                submit2_button = Button(window_prestamos, text="Aceptar", command=submit2, bg="CadetBlue4", padx="20", pady="10",
+                                       borderwidth=0, foreground="white", font=("Arial", 10, "bold"), cursor="target")
+                submit2_button.pack(pady=10)
 
         submit_button = Button(window_prestamos, text="Aceptar", command=submit, bg="CadetBlue4", padx="20", pady="10",
                                borderwidth=0, foreground="white", font=("Arial", 10, "bold"), cursor="target")
@@ -291,8 +325,8 @@ class PrincipalWindow:
                           font="Helvetica",
                           fg="black")
         i = 0
-        retorno = ["prueba1", "prueba2", "prueba3"]
-        for prestamo in retorno:
+        prestamos_dem = prestamos_demorados()
+        for prestamo in prestamos_dem:
             i += 1
             listbox.insert(i, prestamo)
         listbox.pack()
@@ -306,7 +340,7 @@ class PrincipalWindow:
         submit2_button.pack(pady=10)
 
     def validate_number(self, new_value, user_input):
-        if new_value.isnumeric() and int(new_value) >= 0:
+        if new_value == "" or (new_value.isnumeric() and int(new_value) >= 0):
             return True
         else:
             return False
