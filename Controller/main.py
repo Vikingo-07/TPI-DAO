@@ -99,6 +99,20 @@ def buscar_libro_por_titulo(libro_titulo):
 def buscar_libro_por_codigo(libro_codigo):
     return get_libro_por_codigo(libro_codigo)
 
+def libros_por_estado(estado):
+    """
+    Busca libros dado un estado ingresado que puede ser.
+    :param estado: DISPONIBLE, PRESTADO, EXTRAVIADO
+    :return:
+    """
+    return get_libros_por_estado(estado)
+
+
+def get_libros_extraviados():
+    libros_prestados = get_libros_prestados()
+    #TODO: pendiente de implementar
+
+
 
 # Funciones para reportes
 
