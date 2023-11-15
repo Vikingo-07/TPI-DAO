@@ -81,23 +81,23 @@ def verificar_socio_habilitado_prestamo(socio_id):
 
 
 def buscar_socio_por_documento(socio_docu):
-    get_socio_por_documento(socio_docu)
+    return get_socio_por_documento(socio_docu)
 
 
 def buscar_socio_por_id(socio_id):
-    get_socio_por_id(socio_id)
+    return get_socio_por_id(socio_id)
 
 
 def buscar_libro_por_id(libro_id):
-    get_libro_por_id(libro_id)
+    return get_libro_por_id(libro_id)
 
 
 def buscar_libro_por_titulo(libro_titulo):
-    get_libro_por_titulo(libro_titulo)
+    return get_libro_por_titulo(libro_titulo)
 
 
 def buscar_libro_por_codigo(libro_codigo):
-    get_libro_por_codigo(libro_codigo)
+    return get_libro_por_codigo(libro_codigo)
 
 
 # Funciones para reportes
