@@ -135,7 +135,6 @@ class PrincipalWindow:
                             fg="white")
         label_book.pack(pady=10)
         for status, quantity in cantidades:
-            print(f"Estado: {status}, Cantidad: {quantity}")
             label_book = Label(window_books, text=f"Hay {quantity} Libros en estado {status}.", font=("Arial", 12), bg="gray22", fg="white")
             label_book.pack(pady=10)
 

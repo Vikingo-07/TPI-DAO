@@ -2,12 +2,19 @@ from datetime import datetime
 import random
 import sqlite3
 from datetime import timedelta, date
+import os
+
+# Obtiene la ruta absoluta del directorio actual
+current_dir = os.path.abspath(os.path.dirname(__file__))
+
+# Construye la ruta completa al archivo de base de datos
+db_path = os.path.join(current_dir, 'database.sqlite3')
 
 
 def crear_db():
     try:
         # Conectar a la base de datos (o crearla si no existe)
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
 
             # Crear la tabla Libros
@@ -66,7 +73,7 @@ def cargar_datos():
                       "Sophia Moore", "Kevin Anderson", "Chloe Harris"]
     try:
         # Conectar a la base de datos
-        with sqlite3.connect('database.sqlite3') as conexion:
+        with sqlite3.connect(db_path) as conexion:
             cursor = conexion.cursor()
 
             # Generar 20 entradas de prueba para la tabla Libros
@@ -112,7 +119,7 @@ def crear_libro(codigo, titulo, precio_reposicion, estado):
     :return:
     """
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('INSERT INTO Libros (Codigo, Titulo, PrecioReposicion, Estado) VALUES (?, ?, ?, ?)',
                            (codigo, titulo, precio_reposicion, estado))
@@ -132,7 +139,7 @@ def modificar_libro(libro_id, nuevo_titulo, nuevo_precio, nuevo_estado):
     :return:
     """
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('UPDATE Libros SET Titulo=?, PrecioReposicion=?, Estado=? WHERE ID=?',
                            (nuevo_titulo, nuevo_precio, nuevo_estado, libro_id))
@@ -149,7 +156,7 @@ def eliminar_libro(libro_id):
     :return:
     """
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('DELETE FROM Libros WHERE ID=?', (libro_id,))
             conn.commit()
@@ -160,7 +167,7 @@ def eliminar_libro(libro_id):
 
 def get_libro_por_id(libro_id):
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM Libros WHERE ID = ?', (libro_id,))
             libro = cursor.fetchone()
@@ -172,7 +179,7 @@ def get_libro_por_id(libro_id):
 
 def get_libro_por_titulo(libro_titulo):
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM Libros WHERE Titulo LIKE ?', ('%' + libro_titulo + '%',))
             libros = cursor.fetchall()
@@ -184,7 +191,7 @@ def get_libro_por_titulo(libro_titulo):
 
 def get_libro_por_codigo(libro_codigo):
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM Libros WHERE Codigo = ?', (libro_codigo,))
             libro = cursor.fetchone()
@@ -205,7 +212,7 @@ def crear_socio(documento, nombre, apellido, telefono):
     :return:
     """
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('INSERT INTO Socios (nroDocumento, Nombre, apellido, telefono) VALUES (?, ?, ?, ?)',
                            (documento, nombre, apellido, telefono))
@@ -225,7 +232,7 @@ def modificar_socio(socio_id, nuevo_nombre, nuevo_apellido, nuevo_telefono):
     :return:
     """
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('UPDATE Socios SET Nombre=?, apellido=?, telefono=? WHERE ID=?',
                            (nuevo_nombre, nuevo_apellido, nuevo_telefono, socio_id))
@@ -242,7 +249,7 @@ def eliminar_socio(socio_id):
     :return:
     """
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('DELETE FROM Socios WHERE ID=?', (socio_id,))
             conn.commit()
@@ -253,7 +260,7 @@ def eliminar_socio(socio_id):
 
 def get_socio_por_documento(socio_docu):
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM Socios WHERE nroDocumento = ?', (socio_docu,))
             socio = cursor.fetchone()
@@ -265,7 +272,7 @@ def get_socio_por_documento(socio_docu):
 
 def get_socio_por_id(socio_id):
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM Socios WHERE ID = ?', (socio_id,))
             socio = cursor.fetchone()
@@ -285,7 +292,7 @@ def registrar_prestamo(libro_id, socio_id, fecha_prestamo, dias_pactados):
     :return:
     """
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('INSERT INTO Prestamos (LibroId, SocioId, FechaPrestamo, DiasPactados) '
                            'VALUES (?, ?, ?, ?, ?)', (libro_id, socio_id, fecha_prestamo, dias_pactados))
@@ -306,7 +313,7 @@ def registrar_devolucion(prestamo_id, fecha_devolucion, demora_dias, libro_id):
     :return:
     """
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('UPDATE Prestamos SET FechaDevolucion=?, DemoraDias=? WHERE ID=?',
                            (fecha_devolucion, demora_dias, prestamo_id))
@@ -326,7 +333,7 @@ def actualizar_estado_libro(libro_id, estado):
     :return:
     """
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('UPDATE Libros SET Estado=? WHERE ID=?', (estado, libro_id))
             conn.commit()
@@ -337,7 +344,7 @@ def actualizar_estado_libro(libro_id, estado):
 
 def get_libros_por_estado(estado):
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM Libros WHERE Estado=?', (estado,))
             libros = cursor.fetchall()
@@ -349,7 +356,7 @@ def get_libros_por_estado(estado):
 
 def obtener_prestamos_por_socio(socio_id):
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM Prestamos WHERE SocioId=?', (socio_id,))
             prestamos = cursor.fetchall()
@@ -361,7 +368,7 @@ def obtener_prestamos_por_socio(socio_id):
 
 def obtener_libros_extraviados():
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT * FROM Libros WHERE Estado=?', ('EXTRAVIADO',))
             libros_extraviados = cursor.fetchall()
@@ -373,7 +380,7 @@ def obtener_libros_extraviados():
 
 def obtener_prestamos_vencidos():
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             hoy = datetime.now().date()
             cursor.execute('SELECT * FROM Prestamos WHERE FechaDevolucion < ? AND DemoraDias IS NULL', (hoy,))
@@ -386,7 +393,7 @@ def obtener_prestamos_vencidos():
 
 def prestamos_activos_de_socio(socio_id):
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
 
             # Verificar si algún préstamo activo tiene demora en su devolución
@@ -403,7 +410,7 @@ def prestamos_activos_de_socio(socio_id):
 
 def contar_prestamos_activos(socio_id):
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT COUNT(*) FROM Prestamos WHERE SocioId=? AND FechaDevolucion IS NULL', (socio_id,))
             return cursor.fetchone()[0]
@@ -414,7 +421,7 @@ def contar_prestamos_activos(socio_id):
 
 def get_all_titulos():
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT Titulo FROM Libros')
             resultados = cursor.fetchall()
@@ -427,7 +434,7 @@ def get_all_titulos():
 def get_libros_prestados():
     #TODO: mal planteada, tiene que devolver prestamos y libros y fechas
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('''
                    SELECT Libros.*
@@ -445,7 +452,7 @@ def get_libros_prestados():
 # Metodos para reportes
 def cantidad_libros_por_estado():
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT Estado, COUNT(*) FROM Libros GROUP BY Estado')
             resultados = cursor.fetchall()
@@ -457,7 +464,7 @@ def cantidad_libros_por_estado():
 
 def sumatoria_precio_reposicion_libros_extraviados():
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT SUM(PrecioReposicion) FROM Libros WHERE Estado=?', ('EXTRAVIADO',))
             suma_precio_reposicion = cursor.fetchone()[0]
@@ -469,7 +476,7 @@ def sumatoria_precio_reposicion_libros_extraviados():
 
 def solicitantes_de_libro(titulo_libro):
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT Socios.Nombre, Socios.apellido '
                            'FROM Socios '
@@ -485,7 +492,7 @@ def solicitantes_de_libro(titulo_libro):
 
 def prestamos_de_socio(socio_id):
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute(
                 'SELECT Libros.Titulo, Prestamos.FechaPrestamo, Prestamos.DiasPactados '
@@ -502,7 +509,7 @@ def prestamos_de_socio(socio_id):
 
 def prestamos_demorados():
     try:
-        with sqlite3.connect('database.sqlite3') as conn:
+        with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
             cursor.execute(
                 'SELECT Socios.Nombre, Socios.apellido, Libros.Titulo, Prestamos.FechaPrestamo, Prestamos.DiasPactados '
