@@ -2,15 +2,9 @@ import datetime
 
 
 class Libro:
-    def __init__(self, codigo, isbn, titulo, precio_rep):
-        """
-        Los parametros estado y fecha desde se setean en la creación de la instancia.
-        :param codigo:
-        :param titulo:
-        :param precio_rep:
-        """
+    def __init__(self, id_libro, codigo, titulo, precio_rep):
+        self.id = id_libro,
         self.codigo = codigo,
-        self.isbn = isbn,
         self.titulo = titulo,
         self.precio_rep = precio_rep,
         self.estado = "DISPONIBLE"
@@ -35,7 +29,7 @@ class Libro:
         Es mas, quizas no debería ser el libro el que controle esto
         :return:
         """
-        fecha_hoy = datetime.datetime.today()
+        fecha_hoy = datetime.datetime.strftime(datetime.datetime.today(), "%d/%m/%Y")
         fecha_desde = datetime.datetime.strptime(self.fecha_desde, "%d/%m/%Y")
         diferencia_dias = fecha_hoy - fecha_desde
         return diferencia_dias.days >= 30

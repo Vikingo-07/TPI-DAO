@@ -1,131 +1,131 @@
-import sqlite3
+from datetime import datetime, timedelta
 
-from Model import *
+import Database.Database
+from Database.Database import *
 
-dbFile = "database.sqlite3"
 
-
-# Administracion de socios
 def alta_socio(socio):
-    try:
-        with sqlite3.connect(dbFile) as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO SOCIOS (nroDocumento, nombre, apellido, telefono) VALUES (?, ?, ?, ?)",
-                (socio.nroDocumento, socio.nombre, socio.apellido, socio.telefono))
-
-            # Confirmar la transacción
-            conn.commit()
-
-    except sqlite3.Error as error:
-        print("Error al registrar al socio: ", error)
+    crear_socio(socio.documento, socio.nombre, socio.apellido, socio.telefono)
 
 
-def mod_socio():
-    pass
+def mod_socio(socio):
+    modificar_socio(socio.id, socio.nombre, socio.apellido, socio.telefono)
 
 
-def baja_socio():
-    pass
+def baja_socio(socio_id):
+    eliminar_socio(socio_id)
 
-
-# Admin. de Libros
 
 def alta_libro(libro):
-    try:
-        with sqlite3.connect(dbFile) as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO LIBROS (isbn, titulo, precio_reposicion, estado, fecha_desde) VALUES (?, ?, ?, ?, ?)",
-                (libro.isbn, libro.titulo, libro.precio_rep, libro.estado, libro.fecha_desde))
-
-            # Confirmar la transacción
-            conn.commit()
-
-    except sqlite3.Error as error:
-        print("Error al registrar al socio: ", error)
+    precio_rep = round(libro.precio_rep, 2)
+    crear_libro(libro.codigo, libro.titulo, precio_rep, libro.estado)
 
 
-def mod_libro():
-    pass
+def mod_libro(libro):
+    precio_rep = round(libro.precio_rep, 2)
+    modificar_libro(libro.id, libro.titulo, precio_rep, libro.estado)
 
 
-def baja_libro():
-    pass
+def baja_libro(libro_id):
+    eliminar_libro(libro_id)
 
 
 def registrar_prestamo(prestamo):
-    try:
-        with sqlite3.connect(dbFile) as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO PRESTAMOS (fecha_actual, doc_socio, cod_libro, dias_devolucion) VALUES (?, ?, ?, ?)",
-                (prestamo.fecha_actual, prestamo.doc_socio, prestamo.cod_libro, prestamo.dias_devolucion))
-
-            # Confirmar la transacción
-            conn.commit()
-
-    except sqlite3.Error as error:
-        print("Error al registrar prestamo: ", error)
+    fecha_prestamo = datetime.strftime(datetime.today(), "%d/%m/%Y")
+    registrar_prestamo(prestamo.libro, prestamo.socio, fecha_prestamo, prestamo.dias_pactados)
 
 
-def registrar_devolucion(devolucion):
-    try:
-        with sqlite3.connect(dbFile) as conn:
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO DEVOLUCIONES (fecha_actual, doc_socio, cod_libro, dias_demora) VALUES (?, ?, ?, ?)",
-                (devolucion.fecha_actual, devolucion.doc_socio, devolucion.cod_libro, devolucion.dias_demora))
+def registrar_devolucion(prestamo):
+    fecha_devolucion = datetime.strftime(datetime.today(), "%d/%m/%Y")
+    demora_dias = datetime.strptime(
+        fecha_devolucion, "%d/%m/%Y") - datetime.strptime(
+        prestamo.fecha_prestamo, "%d/%m/%Y")
+    registrar_devolucion(prestamo.id, fecha_devolucion, demora_dias, prestamo.libro)
 
-            # Confirmar la transacción
-            conn.commit()
 
-    except sqlite3.Error as error:
-        print("Error al registrar devolucion: ", error)
+def registrar_libro_prestado(cod_libro):
+    """
+    No utilizar para las devoluciones y los prestamos. Esas funciones ya realizan la actualización por su cuenta.
+    :param cod_libro:
+    :return:
+    """
+    actualizar_estado_libro(cod_libro, 'PRESTADO')
 
-def registrar_extravio(cod_libro):
-    # 1. busco en la bd el libro que tengo que modificar
-    # 2. Actualizo el estado por extraviado
-    #
 
-def main():
-    print("Bienvenido al sistema de biblioteca")
-    print("1. Alta socio")
-    print("2. Mod. Socio")
-    print("3. Baja socio")
-    print("4. Alta de libros")
-    print("5. Mod. de libros")
-    print("6. Baja de libros")
-    print("7. Registración de préstamos")
-    print("8. Registración de devoluciones")
-    print("9. Registración de libros extraviados")
-    print("10. Reportes")
-    print("11. Salir")
-    while True:
-        opcion = input("Selecciona una opción (1-11): ")
+def registrar_libro_devuelto(cod_libro):
+    """
+    No utilizar para las devoluciones y los prestamos. Esas funciones ya realizan la actualización por su cuenta.
+    El metodo puede servir para registrar un libro que fue devuelto tiempo despues de registrarse como extraviado.
+    :param cod_libro:
+    :return:
+    """
+    actualizar_estado_libro(cod_libro, 'DISPONIBLE')
 
-        if opcion == "1":
-            alta_socio()
-        elif opcion == "2":
-            mod_socio()
-        elif opcion == "3":
-            baja_socio()
-        elif opcion == "4":
-            alta_libro()
-        elif opcion == "5":
-            mod_libro()
-        elif opcion == "6":
-            baja_libro()
-        elif opcion == "7":
-            registrar_prestamo()
-        elif opcion == "8":
-            registrar_devolucion()
-        elif opcion == "9":
-            registrar_extravio()
-        elif opcion == "10":
-            print("Ops, funcionalidad en desarrollo...")
-        elif opcion == "11":
-            print("¡Hasta luego!")
-            break
-        else:
-            print("Opción no válida. Por favor, selecciona una opción válida.")
+
+def registrar_libro_extraviado(cod_libro):
+    actualizar_estado_libro(cod_libro, 'EXTRAVIADO')
+
+
+def verificar_socio_habilitado_prestamo(socio_id):
+    cant_prestamos_activos = contar_prestamos_activos(socio_id)
+    if cant_prestamos_activos >= 3:
+        return False # No esta habilitado porque tiene 3 o mas libros pedidos
+    hoy = datetime.now().date()
+    prestamos_activos = prestamos_activos_de_socio(socio_id)
+    for prestamo_activo in prestamos_activos:
+        fecha_pactada = (datetime.strptime(prestamo_activo[0], "%d/%m/%Y") + timedelta(days=prestamo_activo[1])).date()
+
+        if fecha_pactada < hoy:
+            return False
+    return True
+
+
+def buscar_socio_por_documento(socio_docu):
+    get_socio_por_documento(socio_docu)
+
+
+def buscar_socio_por_id(socio_id):
+    get_socio_por_id(socio_id)
+
+
+def buscar_libro_por_id(libro_id):
+    get_libro_por_id(libro_id)
+
+
+def buscar_libro_por_titulo(libro_titulo):
+    get_libro_por_titulo(libro_titulo)
+
+
+def buscar_libro_por_codigo(libro_codigo):
+    get_libro_por_codigo(libro_codigo)
+
+
+# Funciones para reportes
+
+def cantidad_libros_por_estado():
+    return Database.Database.cantidad_libros_por_estado()
+
+
+def total_costo_reposicion():
+    return sumatoria_precio_reposicion_libros_extraviados()
+
+
+def solicitantes_libro(titulo):
+    return solicitantes_de_libro(titulo)
+
+
+def prestamos_socio(socio_id):
+    return prestamos_de_socio(socio_id)
+
+
+def prestamos_demorados():
+    hoy = datetime.now().date()
+
+    prestamos = Database.Database.prestamos_demorados()
+    prestamosDemorados = []
+    for prestamo in prestamos:
+        fecha_pactada = (datetime.strptime(prestamo[3], "%d/%m/%Y") + timedelta(days=prestamo[4])).date()
+
+        if fecha_pactada < hoy:
+            prestamosDemorados.append(prestamo)
+    return prestamosDemorados
