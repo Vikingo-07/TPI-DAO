@@ -11,7 +11,7 @@ def alta_socio(socio):
 
 
 def mod_socio(socio):
-    modificar_socio(socio.id, socio.nombre, socio.apellido, socio.telefono)
+    modificar_socio(socio.id, socio.documento, socio.nombre, socio.apellido, socio.telefono)
 
 
 def baja_socio(socio_id):
@@ -25,7 +25,7 @@ def alta_libro(libro):
 
 def mod_libro(libro):
     precio_rep = round(libro.precio_rep, 2)
-    modificar_libro(libro.id, libro.titulo, precio_rep, libro.estado)
+    modificar_libro(libro.id, libro.codigo, libro.titulo, precio_rep)
 
 
 def baja_libro(libro_id):

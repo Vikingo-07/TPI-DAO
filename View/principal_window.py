@@ -39,8 +39,7 @@ class PrincipalWindow:
         btn_extraviados = Button(botonera, text="Libros Extraviados", bg="medium turquoise", padx="19", pady="50",
                                  borderwidth=0, foreground="white", font=("Arial", 10, "bold"), cursor="target")
         btn_extraviados.pack(side="top", pady=10)
-        #btn_extraviados["command"] = self.extraviados
-        btn_extraviados["command"] = self.libros_extraviados_command
+        btn_extraviados["command"] = self.extraviados
 
         btn_reportes = Button(botonera, text="Reportes", bg="medium turquoise", padx="44", pady="50", borderwidth=0,
                               foreground="white", font=("Arial", 10, "bold"), cursor="target")
@@ -59,6 +58,7 @@ class PrincipalWindow:
     def socios(self):
         self.eliminar_botones_reporte()
         self.lblgral.configure(text="Socios")
+        self.crear_boton_ABM_socios()
 
         # Crear el Treeview (grilla)
         tree = ttk.Treeview(self.window, columns=('ID', 'NroDocumento', 'Nombre', 'Apellido', 'Teléfono'))
@@ -74,7 +74,6 @@ class PrincipalWindow:
 
         # Insertar datos en la grilla
         for socio in datos_socios:
-            print(socio.nombre, socio.apellido)
             tree.insert('', 'end', values=(socio.id, socio.documento, socio.nombre, socio.apellido, socio.telefono))
 
         # Mostrar la grilla
@@ -83,7 +82,9 @@ class PrincipalWindow:
 
     def libros(self):
         self.eliminar_botones_reporte()
+        self.eliminar_botones_libros_extraviados()
         self.lblgral.configure(text="Libros")
+        self.crear_boton_ABM_libro()
 
     def prestamos(self):
         self.eliminar_botones_reporte()
@@ -92,7 +93,8 @@ class PrincipalWindow:
     def extraviados(self):
         self.eliminar_botones_reporte()
         self.lblgral.configure(text="Libros extraviados")
-
+        self.libros_extraviados_command()
+# ACA INICIA EL ABMC DE SOCIOS, LIBROS Y EXTRAVÍOS
     def crear_boton_extravio(self):
         if hasattr(self, 'btn_abmExtravio'):
             return
@@ -108,7 +110,7 @@ class PrincipalWindow:
         window_extravio = Toplevel(self.window)
         window_extravio.title("Registro de Libros Extraviados")
         window_extravio.geometry("+250+100")
-        window_extravio.geometry("600x300")
+        window_extravio.geometry("900x500")
         window_extravio.iconbitmap("../Files/icono.ico")
         window_extravio.configure(bg="gray22")
 
@@ -117,7 +119,7 @@ class PrincipalWindow:
         label_extravio.pack(pady=10)
 
         # Configurar la Treeview
-        columns = ("Codigo", "Titulo", "Precio de reposicion", "Estado")
+        columns = ("ID", "Codigo", "Titulo", "Precio de reposicion", "Estado")
         treeview = ttk.Treeview(window_extravio, columns=columns)
         for col in columns:
             treeview.heading(col, text=col, anchor="center")
@@ -129,7 +131,7 @@ class PrincipalWindow:
 
         # Insertar datos en la grilla
         for libro in libros_extraviados:
-            treeview.insert('', 'end', values=(libro.codigo, libro.titulo, libro.precio_rep, libro.estado))
+            treeview.insert('', 'end', values=(libro.id, libro.codigo, libro.titulo, libro.precio_rep, libro.estado))
 
         treeview.pack(padx=10, pady=10)
 
@@ -142,8 +144,8 @@ class PrincipalWindow:
             self.textboxes.append(entry)
 
         def submit():
-
             libro_id = self.textboxes[0].get()  # Suponiendo que el ID está en el primer cuadro de texto
+            print(libro_id)
 
             # Llama a la función registrar_extravio con los valores obtenidos
             registrar_libro_extraviado(libro_id)
@@ -160,6 +162,387 @@ class PrincipalWindow:
         if self.bandera:
             self.bandera = False
             self.btn_abmExtravio.destroy()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def crear_boton_ABM_libro(self):
+
+        self.btn_abm_alta = Button(self.window, text="ALTA DE LIBRO", bg="CadetBlue4", padx="44",
+                                   pady="30", borderwidth=0, foreground="white",
+                                   font=("Arial", 10, "bold"), cursor="target")
+        self.btn_abm_alta.pack(side="top", pady=10)
+        self.btn_abm_alta["command"] = self.alta_libro_command
+        self.btn_abm_modificacion = Button(self.window, text="MODIFICACION DE LIBRO", bg="CadetBlue4", padx="44",
+                                           pady="30", borderwidth=0, foreground="white",
+                                           font=("Arial", 10, "bold"), cursor="target")
+        self.btn_abm_modificacion.pack(side="top", pady=30)
+        self.btn_abm_modificacion["command"] = self.modificacion_libro_command
+        self.btn_abm_baja = Button(self.window, text="BAJA DE LIBRO", bg="CadetBlue4", padx="44",
+                                   pady="30", borderwidth=0, foreground="white",
+                                   font=("Arial", 10, "bold"), cursor="target")
+        self.btn_abm_baja.pack(side="top", pady=50)
+        self.btn_abm_baja["command"] = self.baja_libro_command
+
+    def alta_libro_command(self):
+        window_alta_libro = Toplevel(self.window)
+        window_alta_libro.title("Alta de Libro")
+        window_alta_libro.geometry("+250+100")
+        window_alta_libro.geometry("600x300")
+        window_alta_libro.iconbitmap("../Files/icono.ico")
+        window_alta_libro.configure(bg="gray22")
+        label_alta_libro = Label(window_alta_libro, text="Alta de Libro", font=("Arial", 20), bg="gray22", fg="white")
+        label_alta_libro.pack(pady=10)
+
+        # Lista de etiquetas y entry widgets
+        etiquetas = ["Código:", "Título:", "Precio de Reposición:"]
+        entries = []
+
+        # Crear etiquetas y entry widgets
+        for etiqueta_text in etiquetas:
+            frame = Frame(window_alta_libro, bg="gray22")
+            frame.pack(pady=5)
+
+            etiqueta = Label(frame, text=etiqueta_text, font=("Arial", 12), bg="gray22", fg="white", padx=10)
+            etiqueta.pack(side="left")
+
+            entry = Entry(frame, font=("Arial", 12))
+            entry.pack(side="right")
+
+            entries.append(entry)
+
+        # Agregar más elementos según sea necesario (por ejemplo, para más campos de entrada)
+
+        # Botón para guardar los datos
+        boton_guardar = Button(window_alta_libro, text="Guardar", command=lambda: self.guardar_datos_alta(entries))
+        boton_guardar.pack(pady=10)
+
+    def guardar_datos_alta(self, entries):
+        # Recupera los datos de las Entry widgets
+        codigo = entries[0].get()
+        titulo = entries[1].get()
+        precio_rep = round(float(entries[2].get()), 2)
+        estado = "DISPONIBLE"
+
+        # Llama a la función alta_libro con los datos recuperados
+        libro = Libro(0, codigo, titulo, precio_rep, estado)
+        alta_libro(libro)
+        #window_alta_libro.destroy()
+
+
+    def modificacion_libro_command(self):
+        window_mod_libro = Toplevel(self.window)
+        window_mod_libro.title("Modificación de Libro")
+        window_mod_libro.geometry("+250+100")
+        window_mod_libro.geometry("600x300")
+        window_mod_libro.iconbitmap("../Files/icono.ico")
+        window_mod_libro.configure(bg="gray22")
+        label_alta_libro = Label(window_mod_libro, text="Modificación de Libro", font=("Arial", 20), bg="gray22", fg="white")
+        label_alta_libro.pack(pady=10)
+
+        # Lista de etiquetas y entry widgets
+        etiquetas = ["ID:", "Código:", "Título:", "Precio de Reposición:"]
+        entries = []
+
+        # Crear etiquetas y entry widgets
+        for etiqueta_text in etiquetas:
+            frame = Frame(window_mod_libro, bg="gray22")
+            frame.pack(pady=5)
+
+            etiqueta = Label(frame, text=etiqueta_text, font=("Arial", 12), bg="gray22", fg="white", padx=10)
+            etiqueta.pack(side="left")
+
+            entry = Entry(frame, font=("Arial", 12))
+            entry.pack(side="right")
+
+            entries.append(entry)
+
+        # Agregar más elementos según sea necesario (por ejemplo, para más campos de entrada)
+
+        # Botón para guardar los datos
+        boton_guardar = Button(window_mod_libro, text="Guardar", command=lambda: self.guardar_datos_mod(entries))
+        boton_guardar.pack(pady=10)
+
+    def guardar_datos_mod(self, entries):
+        # Recupera los datos de las Entry widgets
+        ID = entries[0].get()
+        codigo = entries[1].get()
+        titulo = entries[2].get()
+        precio_rep = round(float(entries[3].get()), 2)
+
+        # Llama a la función alta_libro con los datos recuperados
+        libro = Libro(ID, codigo, titulo, precio_rep, "INVALID")
+        mod_libro(libro)
+        # window_alta_libro.destroy()
+
+    def baja_libro_command(self):
+        window_baja_libro = Toplevel(self.window)
+        window_baja_libro.title("Baja de Libro")
+        window_baja_libro.geometry("+250+100")
+        window_baja_libro.geometry("600x300")
+        window_baja_libro.iconbitmap("../Files/icono.ico")
+        window_baja_libro.configure(bg="gray22")
+        label_baja_libro = Label(window_baja_libro, text="Baja de Libro", font=("Arial", 20), bg="gray22", fg="white")
+        label_baja_libro.pack(pady=10)
+
+        # Lista de etiquetas y entry widgets
+        etiquetas = ["Código:"]
+        entries = []
+
+        # Crear etiquetas y entry widgets
+        for etiqueta_text in etiquetas:
+            frame = Frame(window_baja_libro, bg="gray22")
+            frame.pack(pady=5)
+
+            etiqueta = Label(frame, text=etiqueta_text, font=("Arial", 12), bg="gray22", fg="white", padx=10)
+            etiqueta.pack(side="left")
+
+            entry = Entry(frame, font=("Arial", 12))
+            entry.pack(side="right")
+
+            entries.append(entry)
+
+        # Agregar más elementos según sea necesario (por ejemplo, para más campos de entrada)
+
+        # Botón para guardar los datos
+        boton_guardar = Button(window_baja_libro, text="Guardar", command=lambda: self.guardar_datos_baja(entries))
+        boton_guardar.pack(pady=10)
+
+    def guardar_datos_baja(self, entries):
+        # Recupera los datos de las Entry widgets
+        codigo = entries[0].get()
+
+        # Llama a la función alta_libro con los datos recuperados
+        baja_libro(codigo)
+        #window_baja_libro.destroy()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def baja_socio_command(self):
+        window_baja_socio = Toplevel(self.window)
+        window_baja_socio.title("Baja de Socio")
+        window_baja_socio.geometry("+250+100")
+        window_baja_socio.geometry("600x300")
+        window_baja_socio.iconbitmap("../Files/icono.ico")
+        window_baja_socio.configure(bg="gray22")
+        label_baja_socio = Label(window_baja_socio, text="Baja de Socio", font=("Arial", 20), bg="gray22", fg="white")
+        label_baja_socio.pack(pady=10)
+
+        # Lista de etiquetas y entry widgets
+        etiquetas = ["Documento:"]
+        entries = []
+
+        # Crear etiquetas y entry widgets
+        for etiqueta_text in etiquetas:
+            frame = Frame(window_baja_socio, bg="gray22")
+            frame.pack(pady=5)
+
+            etiqueta = Label(frame, text=etiqueta_text, font=("Arial", 12), bg="gray22", fg="white", padx=10)
+            etiqueta.pack(side="left")
+
+            entry = Entry(frame, font=("Arial", 12))
+            entry.pack(side="right")
+
+            entries.append(entry)
+
+        # Agregar más elementos según sea necesario (por ejemplo, para más campos de entrada)
+
+        # Botón para guardar los datos
+        boton_guardar = Button(window_baja_socio, text="Guardar", command=lambda: self.guardar_datos_socio_baja(entries))
+        boton_guardar.pack(pady=10)
+
+    def guardar_datos_socio_baja(self, entries):
+        # Recupera los datos de las Entry widgets
+        codigo = entries[0].get()
+
+        # Llama a la función alta_libro con los datos recuperados
+        baja_socio(codigo)
+        #window_baja_socio.destroy()
+
+
+    def alta_socio_command(self):
+        window_alta_socio = Toplevel(self.window)
+        window_alta_socio.title("Alta de socio")
+        window_alta_socio.geometry("+250+100")
+        window_alta_socio.geometry("600x300")
+        window_alta_socio.iconbitmap("../Files/icono.ico")
+        window_alta_socio.configure(bg="gray22")
+        label_alta_socio = Label(window_alta_socio, text="Alta de Socio", font=("Arial", 20), bg="gray22", fg="white")
+        label_alta_socio.pack(pady=10)
+
+        # Lista de etiquetas y entry widgets
+        etiquetas = ["Documento:", "Nombre:", "Apellido:", "Telefono"]
+        entries = []
+
+        # Crear etiquetas y entry widgets
+        for etiqueta_text in etiquetas:
+            frame = Frame(window_alta_socio, bg="gray22")
+            frame.pack(pady=5)
+
+            etiqueta = Label(frame, text=etiqueta_text, font=("Arial", 12), bg="gray22", fg="white", padx=10)
+            etiqueta.pack(side="left")
+
+            entry = Entry(frame, font=("Arial", 12))
+            entry.pack(side="right")
+
+            entries.append(entry)
+
+        # Agregar más elementos según sea necesario (por ejemplo, para más campos de entrada)
+
+        # Botón para guardar los datos
+        boton_guardar = Button(window_alta_socio, text="Guardar", command=lambda: self.guardar_datos_socio_alta(entries))
+        boton_guardar.pack(pady=10)
+
+    def guardar_datos_socio_alta(self, entries):
+        # Recupera los datos de las Entry widgets
+        documento = entries[0].get()
+        nombre = entries[1].get()
+        apellido = entries[2].get()
+        telefono = entries[3].get()
+
+        socio = Socio(0, documento, nombre, apellido, telefono)
+        # Llama a la función alta_libro con los datos recuperados
+        alta_socio(socio)
+        #window_alta_socio.destroy()
+
+
+    def modificacion_socio_command(self):
+        window_alta_socio = Toplevel(self.window)
+        window_alta_socio.title("Modificación de socio")
+        window_alta_socio.geometry("+250+100")
+        window_alta_socio.geometry("600x300")
+        window_alta_socio.iconbitmap("../Files/icono.ico")
+        window_alta_socio.configure(bg="gray22")
+        label_alta_socio = Label(window_alta_socio, text="Modificación de Socio", font=("Arial", 20), bg="gray22", fg="white")
+        label_alta_socio.pack(pady=10)
+
+        # Lista de etiquetas y entry widgets
+        etiquetas = ["ID", "Documento:", "Nombre:", "Apellido:", "Telefono"]
+        entries = []
+
+        # Crear etiquetas y entry widgets
+        for etiqueta_text in etiquetas:
+            frame = Frame(window_alta_socio, bg="gray22")
+            frame.pack(pady=5)
+
+            etiqueta = Label(frame, text=etiqueta_text, font=("Arial", 12), bg="gray22", fg="white", padx=10)
+            etiqueta.pack(side="left")
+
+            entry = Entry(frame, font=("Arial", 12))
+            entry.pack(side="right")
+
+            entries.append(entry)
+
+        # Agregar más elementos según sea necesario (por ejemplo, para más campos de entrada)
+
+        # Botón para guardar los datos
+        boton_guardar = Button(window_alta_socio, text="Guardar", command=lambda: self.guardar_datos_socio_mod(entries))
+        boton_guardar.pack(pady=10)
+
+
+    def guardar_datos_socio_mod(self, entries):
+        # Recupera los datos de las Entry widgets
+        socio_id = entries[0].get()
+        documento = entries[1].get()
+        nombre = entries[2].get()
+        apellido = entries[3].get()
+        telefono = entries[4].get()
+
+        socio = Socio(socio_id, documento, nombre, apellido, telefono)
+        # Llama a la función alta_libro con los datos recuperados
+        mod_socio(socio)
+
+        # window_alta_socio.destroy()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def crear_boton_ABM_socios(self):
+        self.btn_abm_alta_socio = Button(self.window, text="ALTA DE SOCIO", bg="CadetBlue4", padx="44",
+                                         pady="30", borderwidth=0, foreground="white",
+                                         font=("Arial", 10, "bold"), cursor="target")
+        self.btn_abm_alta_socio.pack(side="top", pady=10)
+        self.btn_abm_alta_socio["command"] = self.alta_socio_command
+
+        self.btn_abm_modificacion_socio = Button(self.window, text="MODIFICACION DE SOCIO", bg="CadetBlue4", padx="44",
+                                                 pady="30", borderwidth=0, foreground="white",
+                                                 font=("Arial", 10, "bold"), cursor="target")
+        self.btn_abm_modificacion_socio.pack(side="top", pady=30)
+        self.btn_abm_modificacion_socio["command"] = self.modificacion_socio_command
+
+        self.btn_abm_baja_socio = Button(self.window, text="BAJA DE SOCIO", bg="CadetBlue4", padx="44",
+                                         pady="30", borderwidth=0, foreground="white",
+                                         font=("Arial", 10, "bold"), cursor="target")
+        self.btn_abm_baja_socio.pack(side="top", pady=50)
+        self.btn_abm_baja_socio["command"] = self.baja_socio_command
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -130,20 +130,12 @@ def crear_libro(codigo, titulo, precio_reposicion, estado):
         print(f"Error al crear el libro: {e}")
 
 
-def modificar_libro(libro_id, nuevo_titulo, nuevo_precio, nuevo_estado):
-    """
-
-    :param libro_id:
-    :param nuevo_titulo:
-    :param nuevo_precio:
-    :param nuevo_estado:
-    :return:
-    """
+def modificar_libro(libro_id, codigo, nuevo_titulo, nuevo_precio):
     try:
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute('UPDATE Libros SET Titulo=?, PrecioReposicion=?, Estado=? WHERE ID=?',
-                           (nuevo_titulo, nuevo_precio, nuevo_estado, libro_id))
+            cursor.execute('UPDATE Libros SET Codigo=?, Titulo=?, PrecioReposicion=? WHERE ID=?',
+                           (codigo, nuevo_titulo, nuevo_precio, libro_id))
             conn.commit()
             print("Libro modificado exitosamente.")
     except Exception as e:
@@ -234,20 +226,12 @@ def crear_socio(documento, nombre, apellido, telefono):
         print(f"Error al crear el socio: {e}")
 
 
-def modificar_socio(socio_id, nuevo_nombre, nuevo_apellido, nuevo_telefono):
-    """
-
-    :param socio_id:
-    :param nuevo_nombre:
-    :param nuevo_apellido:
-    :param nuevo_telefono:
-    :return:
-    """
+def modificar_socio(socio_id, nuevo_doc, nuevo_nombre, nuevo_apellido, nuevo_telefono):
     try:
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute('UPDATE Socios SET Nombre=?, apellido=?, telefono=? WHERE ID=?',
-                           (nuevo_nombre, nuevo_apellido, nuevo_telefono, socio_id))
+            cursor.execute('UPDATE Socios SET nroDocumento=?, Nombre=?, apellido=?, telefono=? WHERE ID=?',
+                           (nuevo_doc, nuevo_nombre, nuevo_apellido, nuevo_telefono, socio_id))
             conn.commit()
             print("Socio modificado exitosamente.")
     except Exception as e:
